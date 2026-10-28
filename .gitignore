@@ -1,0 +1,18 @@
+node_modules/
+dist/
+coverage/
+logs/
+.vite/
+.env
+.env.*
+*.log
+
+# The --skip-zk compiler output (contract/managed/**) is committed so the
+# tests run with only Node installed; CI recompiles it and fails on drift.
+# Proving/verifying keys from a full `compact compile` are large and
+# reproducible, so they stay out of git.
+contract/managed/*/keys/
+contract/managed/*/zkir/*.bzkir
+
+# midnight-js private state created by the devnet lane
+midnight-level-db/
