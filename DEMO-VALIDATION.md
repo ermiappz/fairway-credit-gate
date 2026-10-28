@@ -14,4 +14,4 @@ All five private presentation views passed automated checks in local Chrome at 1
 
 The hosted static view shows imported records or replayed results from actual local execution. It has no live LLM/backend connection. Browser review does not change Linear; recommendations do not authorize funds; no notification or blockchain transaction is sent. Real-data sources preserve historical/proposal status. Credential-pattern scanning found no credential candidates in the prepared demo inputs and outputs.
 
-Deployment access is owner-private; private GitHub access is separate. Cross-project navigation opens each independently hosted private Site. Source documents and generated outputs should remain private.
+Deployment access is owner-private; private GitHub access is separate. Cross-project navigation opens each independently hosted private Site. This Credit Gate repository is now public and contains fictional member data. The other projects and hosted Sites remain private. The browser checks above describe the earlier five-project validation pass.
