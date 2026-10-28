@@ -1,0 +1,440 @@
+{
+  "mode": "compiled-circuit-simulation",
+  "synthetic": true,
+  "notice": "Actual compiled circuits executed locally. No ZK proof was generated and no network transaction was submitted. Member policy is a separate synthetic reference, not institutional policy DEMO-0.1.",
+  "members": [
+    {
+      "label": "member-A",
+      "story": "long-standing saver, strong repayment record",
+      "profile": {
+        "repaymentScore": 720,
+        "monthlySavings": 2500,
+        "monthsAsMember": 30
+      },
+      "request": 8000
+    },
+    {
+      "label": "member-B",
+      "story": "good record, asks for more than Tier 2 allows",
+      "profile": {
+        "repaymentScore": 650,
+        "monthlySavings": 1800,
+        "monthsAsMember": 14
+      },
+      "request": 9000,
+      "acceptsOffer": true
+    },
+    {
+      "label": "member-C",
+      "story": "excellent numbers, but joined 4 months ago",
+      "profile": {
+        "repaymentScore": 790,
+        "monthlySavings": 3100,
+        "monthsAsMember": 4
+      },
+      "request": 2000
+    },
+    {
+      "label": "member-F",
+      "story": "Tier 3 boundary; accepts a capped offer",
+      "profile": {
+        "repaymentScore": 580,
+        "monthlySavings": 1100,
+        "monthsAsMember": 6
+      },
+      "request": 4500,
+      "acceptsOffer": true
+    },
+    {
+      "label": "member-G",
+      "story": "Tier 2 member declines the smaller offer",
+      "profile": {
+        "repaymentScore": 600,
+        "monthlySavings": 1500,
+        "monthsAsMember": 10
+      },
+      "request": 8500,
+      "acceptsOffer": false
+    },
+    {
+      "label": "member-H",
+      "story": "Repayment score below the minimum",
+      "profile": {
+        "repaymentScore": 579,
+        "monthlySavings": 2200,
+        "monthsAsMember": 18
+      },
+      "request": 2500
+    }
+  ],
+  "events": [
+    {
+      "kind": "step",
+      "text": "1. SACCO starts its signing service (off chain)"
+    },
+    {
+      "kind": "line",
+      "text": "attestation API on http://127.0.0.1:55728  (POST /attest, GET /provider-info)"
+    },
+    {
+      "kind": "line",
+      "text": "provider id 1, Jubjub public key x=17796912199230…"
+    },
+    {
+      "kind": "step",
+      "text": "2. Admin deploys the contract and registers the SACCO key on the ledger"
+    },
+    {
+      "kind": "line",
+      "text": "contractAdmin = 0x3aab92fb49…  (hash of the admin's secret, not the secret)"
+    },
+    {
+      "kind": "line",
+      "text": "providers[1] = SACCO public key"
+    },
+    {
+      "kind": "step",
+      "text": "3. Members request loans (synthetic data)"
+    },
+    {
+      "kind": "line",
+      "text": ""
+    },
+    {
+      "kind": "line",
+      "text": "member-A: long-standing saver, strong repayment record"
+    },
+    {
+      "kind": "line",
+      "text": "  on device only : repayment 720, savings 2,500 ETB/month, 30 months, secret + PIN"
+    },
+    {
+      "kind": "line",
+      "text": "  SACCO signs    : profile bound to member key 0x92616e0e5e…"
+    },
+    {
+      "kind": "line",
+      "text": "  requests       : 8,000 ETB"
+    },
+    {
+      "kind": "ok",
+      "text": "  ledger records : Approved, 8,000 ETB"
+    },
+    {
+      "kind": "line",
+      "text": ""
+    },
+    {
+      "kind": "line",
+      "text": "member-B: good record, asks for more than Tier 2 allows"
+    },
+    {
+      "kind": "line",
+      "text": "  on device only : repayment 650, savings 1,800 ETB/month, 14 months, secret + PIN"
+    },
+    {
+      "kind": "line",
+      "text": "  SACCO signs    : profile bound to member key 0xd50960a7b4…"
+    },
+    {
+      "kind": "line",
+      "text": "  requests       : 9,000 ETB"
+    },
+    {
+      "kind": "ok",
+      "text": "  ledger records : Proposed, 7,000 ETB"
+    },
+    {
+      "kind": "ok",
+      "text": "  accepts offer  : Approved, 7,000 ETB"
+    },
+    {
+      "kind": "line",
+      "text": ""
+    },
+    {
+      "kind": "line",
+      "text": "member-C: excellent numbers, but joined 4 months ago"
+    },
+    {
+      "kind": "line",
+      "text": "  on device only : repayment 790, savings 3,100 ETB/month, 4 months, secret + PIN"
+    },
+    {
+      "kind": "line",
+      "text": "  SACCO signs    : profile bound to member key 0x7a58790c60…"
+    },
+    {
+      "kind": "line",
+      "text": "  requests       : 2,000 ETB"
+    },
+    {
+      "kind": "ok",
+      "text": "  ledger records : Rejected, 0 ETB"
+    },
+    {
+      "kind": "line",
+      "text": ""
+    },
+    {
+      "kind": "line",
+      "text": "member-F: Tier 3 boundary; accepts a capped offer"
+    },
+    {
+      "kind": "line",
+      "text": "  on device only : repayment 580, savings 1,100 ETB/month, 6 months, secret + PIN"
+    },
+    {
+      "kind": "line",
+      "text": "  SACCO signs    : profile bound to member key 0x50bc50ede6…"
+    },
+    {
+      "kind": "line",
+      "text": "  requests       : 4,500 ETB"
+    },
+    {
+      "kind": "ok",
+      "text": "  ledger records : Proposed, 3,000 ETB"
+    },
+    {
+      "kind": "ok",
+      "text": "  accepts offer  : Approved, 3,000 ETB"
+    },
+    {
+      "kind": "line",
+      "text": ""
+    },
+    {
+      "kind": "line",
+      "text": "member-G: Tier 2 member declines the smaller offer"
+    },
+    {
+      "kind": "line",
+      "text": "  on device only : repayment 600, savings 1,500 ETB/month, 10 months, secret + PIN"
+    },
+    {
+      "kind": "line",
+      "text": "  SACCO signs    : profile bound to member key 0x137f3554cd…"
+    },
+    {
+      "kind": "line",
+      "text": "  requests       : 8,500 ETB"
+    },
+    {
+      "kind": "ok",
+      "text": "  ledger records : Proposed, 7,000 ETB"
+    },
+    {
+      "kind": "ok",
+      "text": "  accepts offer  : NotAccepted, 0 ETB"
+    },
+    {
+      "kind": "line",
+      "text": ""
+    },
+    {
+      "kind": "line",
+      "text": "member-H: Repayment score below the minimum"
+    },
+    {
+      "kind": "line",
+      "text": "  on device only : repayment 579, savings 2,200 ETB/month, 18 months, secret + PIN"
+    },
+    {
+      "kind": "line",
+      "text": "  SACCO signs    : profile bound to member key 0xd5f2f14319…"
+    },
+    {
+      "kind": "line",
+      "text": "  requests       : 2,500 ETB"
+    },
+    {
+      "kind": "ok",
+      "text": "  ledger records : Rejected, 0 ETB"
+    },
+    {
+      "kind": "step",
+      "text": "4. Attempts the circuit refuses (no proof, so no transaction)"
+    },
+    {
+      "kind": "refused",
+      "text": "member-D edits savings 1,200 → 2,600 after signing\n      refused: \"Invalid attestation signature\""
+    },
+    {
+      "kind": "refused",
+      "text": "member-E replays member-A's signed profile\n      refused: \"Invalid attestation signature\""
+    },
+    {
+      "kind": "refused",
+      "text": "self-made signer claims to be provider 7\n      refused: \"Attestation provider not registered\""
+    },
+    {
+      "kind": "refused",
+      "text": "a member tries to register their own signer\n      refused: \"Only admin can register providers\""
+    },
+    {
+      "kind": "step",
+      "text": "5. The public ledger after all of the above"
+    },
+    {
+      "kind": "line",
+      "text": "ledger fields : blacklist, contractAdmin, loans, onGoingPinMigration, providers"
+    },
+    {
+      "kind": "line",
+      "text": "member keys   : 6 (refused attempts left no entry)"
+    },
+    {
+      "kind": "line",
+      "text": "providers     : 1"
+    },
+    {
+      "kind": "line",
+      "text": "loans         :"
+    },
+    {
+      "kind": "line",
+      "text": "  0x92616e0e5e…  #1  Approved   8,000 ETB   (member-A)"
+    },
+    {
+      "kind": "line",
+      "text": "  0xd50960a7b4…  #1  Approved   7,000 ETB   (member-B)"
+    },
+    {
+      "kind": "line",
+      "text": "  0x7a58790c60…  #1  Rejected       0 ETB   (member-C)"
+    },
+    {
+      "kind": "line",
+      "text": "  0x50bc50ede6…  #1  Approved   3,000 ETB   (member-F)"
+    },
+    {
+      "kind": "line",
+      "text": "  0x137f3554cd…  #1  NotAccepted      0 ETB   (member-G)"
+    },
+    {
+      "kind": "line",
+      "text": "  0xd5f2f14319…  #1  Rejected       0 ETB   (member-H)"
+    },
+    {
+      "kind": "line",
+      "text": ""
+    },
+    {
+      "kind": "ok",
+      "text": "each loan record holds only: authorizedAmount, status"
+    },
+    {
+      "kind": "ok",
+      "text": "none of the 18 private profile values appear on the ledger"
+    }
+  ],
+  "result": {
+    "providerPk": {
+      "x": "17796912199230837517082309137669714357366627654429840144375221198639408603128",
+      "y": "10499356802175765781444628929214092731222928452734440680270994103157194350818"
+    },
+    "loans": [
+      {
+        "member": "member-A",
+        "memberKeyHex": "92616e0e5e3a04544bb4c8e2549f7b9ef494f26a0ddcca7e68de51f6bc224bf2",
+        "loanId": "1",
+        "status": "Approved",
+        "amount": "8000"
+      },
+      {
+        "member": "member-B",
+        "memberKeyHex": "d50960a7b4f0d551bc77c58f3d63974bd0402d3770cd2d9137908a24be06434a",
+        "loanId": "1",
+        "status": "Approved",
+        "amount": "7000"
+      },
+      {
+        "member": "member-C",
+        "memberKeyHex": "7a58790c606cbeb3fa5200def859c68a3bd0a8141a164351dab91a619c2d4d5b",
+        "loanId": "1",
+        "status": "Rejected",
+        "amount": "0"
+      },
+      {
+        "member": "member-F",
+        "memberKeyHex": "50bc50ede69c327bf4d5d8d53f26f9d1d054e91a6f81edfa50c6a4b6b312ccfa",
+        "loanId": "1",
+        "status": "Approved",
+        "amount": "3000"
+      },
+      {
+        "member": "member-G",
+        "memberKeyHex": "137f3554cd24ccbef6498b25bfbaeaeb82f247706c188c82eb0faa8cb470d3d4",
+        "loanId": "1",
+        "status": "NotAccepted",
+        "amount": "0"
+      },
+      {
+        "member": "member-H",
+        "memberKeyHex": "d5f2f14319e6105eb6a6f1186452bd496dd30c3348967bfb8fac7c24e604c0e0",
+        "loanId": "1",
+        "status": "Rejected",
+        "amount": "0"
+      }
+    ],
+    "refusals": [
+      {
+        "attempt": "member-D edits savings 1,200 → 2,600 after signing",
+        "error": "Invalid attestation signature"
+      },
+      {
+        "attempt": "member-E replays member-A's signed profile",
+        "error": "Invalid attestation signature"
+      },
+      {
+        "attempt": "self-made signer claims to be provider 7",
+        "error": "Attestation provider not registered"
+      },
+      {
+        "attempt": "a member tries to register their own signer",
+        "error": "Only admin can register providers"
+      }
+    ],
+    "ledgerFields": [
+      "blacklist",
+      "contractAdmin",
+      "loans",
+      "onGoingPinMigration",
+      "providers"
+    ],
+    "loanRecordFields": [
+      "authorizedAmount",
+      "status"
+    ],
+    "privateNumbers": [
+      720,
+      2500,
+      30,
+      650,
+      1800,
+      14,
+      790,
+      3100,
+      4,
+      580,
+      1100,
+      6,
+      600,
+      1500,
+      10,
+      579,
+      2200,
+      18
+    ],
+    "privateNumbersOnLedger": []
+  },
+  "project": "gate",
+  "urls": {
+    "brain": "https://fairway-brain-ermiappz.ermiarch.chatgpt.site",
+    "tasks": "https://fairway-meeting-tasks-ermiappz.ermiarch.chatgpt.site",
+    "credit": "https://fairway-credit-desk-ermiappz.ermiarch.chatgpt.site",
+    "gate": "https://fairway-credit-gate-ermiappz.ermiarch.chatgpt.site",
+    "canary": "https://fairway-canary-ermiappz.ermiarch.chatgpt.site"
+  }
+}

@@ -148,13 +148,14 @@ function expectRefusal(fn: () => void): string {
   throw new Error('expected the circuit to refuse this transaction, but it succeeded');
 }
 
-export async function runScenario(log: Logger = silent): Promise<ScenarioResult> {
+export async function runScenario(log: Logger = silent, members: SyntheticMember[] = MEMBERS): Promise<ScenarioResult> {
   setNetworkId('undeployed');
 
   // ── 1. The SACCO's signing service ──────────────────────────────────────
   log.step('1. SACCO starts its signing service (off chain)');
   const sacco = generateKeyPair(); // ephemeral demo key; production keys live in an HSM
-  const server = createServer(sacco.sk, SACCO_PROVIDER_ID);
+  const providerRecords = new Map<string, Profile>();
+  const server = createServer(sacco.sk, SACCO_PROVIDER_ID, hash => providerRecords.get(hash));
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', () => resolve()));
   const baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
 
@@ -177,11 +178,14 @@ export async function runScenario(log: Logger = silent): Promise<ScenarioResult>
     const keys = new Map<string, Uint8Array>();
     const privateNumbers: number[] = [];
 
-    for (const m of MEMBERS) {
+    for (const m of members) {
       const secret = generateUserSecret();
       const { key, hash } = memberKeyHash(secret, m.pin);
       keys.set(m.label, key);
       privateNumbers.push(m.profile.repaymentScore, m.profile.monthlySavings, m.profile.monthsAsMember);
+      // Fixture enrollment represents the provider's verified books. The API
+      // resolves this record instead of trusting amounts sent by the borrower.
+      providerRecords.set(hash.toString(), { ...m.profile });
 
       log.line('');
       log.line(`${m.label}: ${m.story}`);
@@ -215,6 +219,7 @@ export async function runScenario(log: Logger = silent): Promise<ScenarioResult>
       const pin = 2222n;
       const honest: Profile = { repaymentScore: 610, monthlySavings: 1200, monthsAsMember: 12 };
       const { hash } = memberKeyHash(secret, pin);
+      providerRecords.set(hash.toString(), { ...honest });
       const signature = await askSaccoToAttest(baseUrl, honest, hash);
       // 1,200/month lands in Tier 3 (3,000 ETB); 2,600 would lift this member to Tier 2.
       const edited = { ...honest, monthlySavings: 2600 };
@@ -227,6 +232,7 @@ export async function runScenario(log: Logger = silent): Promise<ScenarioResult>
     {
       const a = MEMBERS[0]!;
       const aSecret = generateUserSecret();
+      providerRecords.set(memberKeyHash(aSecret, a.pin).hash.toString(), { ...a.profile });
       const signedForA = await askSaccoToAttest(baseUrl, a.profile, memberKeyHash(aSecret, a.pin).hash);
       const thief = generateUserSecret();
       sim.circuitContext.currentPrivateState = privateStateFor(thief, a.profile, signedForA, SACCO_PROVIDER_ID);

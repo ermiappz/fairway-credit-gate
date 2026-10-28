@@ -29,7 +29,10 @@ import type { JubjubPoint } from '@midnight-ntwrk/midnight-js-protocol/compact-r
 import { signCreditData, getPublicKey } from './signing.js';
 import type { AttestationRequest, AttestationResponse, ProviderInfoResponse, HealthResponse } from './types.js';
 
-export function createServer(providerSk: bigint, providerId: number): restify.Server {
+export type VerifiedProfile = Pick<AttestationRequest, 'repaymentScore' | 'monthlySavings' | 'monthsAsMember'>;
+
+export function createServer(providerSk: bigint, providerId: number,
+  resolveProfile?: (memberHash: string) => VerifiedProfile | undefined): restify.Server {
   const server = restify.createServer({ name: 'zkloan-attestation-api' });
   server.use(restify.plugins.bodyParser());
 
@@ -51,12 +54,12 @@ export function createServer(providerSk: bigint, providerId: number): restify.Se
     try {
       const body = req.body as AttestationRequest;
 
-      if (
-        body?.repaymentScore == null ||
+      if (!body?.userPubKeyHash || (!resolveProfile && (
+        body.repaymentScore == null ||
         body.monthlySavings == null ||
         body.monthsAsMember == null ||
         body.userPubKeyHash == null
-      ) {
+      ))) {
         res.send(400, {
           error: 'Missing required fields: repaymentScore, monthlySavings, monthsAsMember, userPubKeyHash',
         });
@@ -64,11 +67,18 @@ export function createServer(providerSk: bigint, providerId: number): restify.Se
       }
 
       const userPubKeyHash = BigInt(body.userPubKeyHash);
+      // The private demo selects facts from its controlled provider records.
+      // Legacy callers without a resolver retain the explicit reference API.
+      const profile = resolveProfile ? resolveProfile(userPubKeyHash.toString()) : body;
+      if (!profile) {
+        res.send(404, { error: 'No verified provider record for this member key' });
+        return next();
+      }
       const signature = signCreditData(
         providerSk,
-        body.repaymentScore,
-        body.monthlySavings,
-        body.monthsAsMember,
+        profile.repaymentScore,
+        profile.monthlySavings,
+        profile.monthsAsMember,
         userPubKeyHash,
       );
 
@@ -81,9 +91,9 @@ export function createServer(providerSk: bigint, providerId: number): restify.Se
           response: signature.response.toString(),
         },
         message: {
-          repaymentScore: body.repaymentScore.toString(),
-          monthlySavings: body.monthlySavings.toString(),
-          monthsAsMember: body.monthsAsMember.toString(),
+          repaymentScore: profile.repaymentScore.toString(),
+          monthlySavings: profile.monthlySavings.toString(),
+          monthsAsMember: profile.monthsAsMember.toString(),
           userPubKeyHash: userPubKeyHash.toString(),
         },
       };
