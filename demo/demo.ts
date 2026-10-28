@@ -17,7 +17,7 @@ const cyan = paint('36');
 
 const log: Logger = {
   step: (title) => console.log(`\n${bold(cyan(title))}`),
-  line: (text) => console.log(`   ${text}`),
+  line: (text) => console.log(text ? `   ${text}` : ''),
   ok: (text) => console.log(`${green(' ✓')} ${text}`),
   fail: (text) => console.log(`${red(' ✗')} ${text}`),
 };

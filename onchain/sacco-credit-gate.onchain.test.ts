@@ -81,7 +81,7 @@ const logger = pino({
 
 const network = process.env['MIDNIGHT_NETWORK'] ?? 'local';
 
-describe(`Zk Loan Contract (${network})`, () => {
+describe(`SACCO Credit Gate contract on ${network}`, () => {
   let wallet: MidnightWalletProvider;
   let providers: SaccoCreditGateProviders;
   let contractAddress: ContractAddress;
