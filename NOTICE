@@ -1,0 +1,40 @@
+fairway-credit-gate
+Copyright 2026 Ermias Bunaro
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+It is derived from the zk-loan example in midnightntwrk/midnight-examples
+(https://github.com/midnightntwrk/midnight-examples, examples/zk-loan,
+commit f19c80266c7308b991f03aa935bb92131f9946f3), Copyright (C) Midnight
+Foundation, licensed under the Apache License, Version 2.0. zk-loan was itself
+ported from midnightntwrk/example-zkloan.
+
+Files carried over from zk-loan and modified (each keeps its original
+copyright line and states that it was changed):
+  contract/sacco-credit-gate.compact   (from contract/zk-loan.compact)
+  contract/schnorr.compact
+  contract/witnesses.ts
+  contract/index.ts
+  attestation-api/*.ts
+  test/sacco-credit-gate.sim.test.ts   (from src/test/zk-loan.sim.test.ts)
+  test/sacco-credit-gate.simulator.ts  (from src/test/zk-loan.simulator.ts)
+  test/attestation-api/*.test.ts
+  test/utils/*.ts
+  onchain/sacco-credit-gate.onchain.test.ts (from src/test/zk-loan.test.ts)
+  onchain/config.ts, providers.ts, wallet.ts, wait-for-dust.ts, compose.yml
+
+Summary of modifications: domain model renamed for savings and credit
+cooperatives (creditScore -> repaymentScore, monthlyIncome -> monthlySavings,
+monthsAsCustomer -> monthsAsMember); a six-month membership gate evaluated
+before the tiers; new domain-separation strings for derived keys; tier amounts
+labelled in ETB; new tests for the membership gate and for the absence of
+profile data on the ledger; standalone npm build; narrated simulator demo.
+
+Files written for this repository: demo/*, test/demo.test.ts, Makefile,
+scripts/into-monorepo.sh, onchain/monorepo/*, .github/workflows/ci.yml and
+the documentation (README.md, WALKTHROUGH.md, DEMO.md).
+
+All member data in this repository is synthetic.
+
+This is an independent public reference version. It is not an official
+Midnight Foundation or Fairway Oy release.

@@ -21,8 +21,8 @@
 // never leaves their machine. It is supplied by a witness, checked against an
 // off-chain attestation signed by their SACCO as a registered provider
 // (Schnorr on Jubjub, verified IN-CIRCUIT by schnorr.compact), and run through
-// the membership gate and tier rules inside the ZK proof. Only the OUTCOME — loan status and authorized amount — is disclosed
-// to the public ledger.
+// the membership gate and tier rules inside the ZK proof. Only the OUTCOME
+// (loan status and authorized amount) is disclosed to the public ledger.
 //
 // Identity is witness-derived throughout. Every browser/CLI instance holds a
 // single 32-byte `userSecretKey` in private state; both the admin role and the
@@ -189,7 +189,7 @@ circuit evaluateApplicant(userPubKeyHash: Field): [Uint<16>, LoanStatus] {
     Schnorr_schnorrVerify<4>(msg, signature, providerPk);
 
     // SACCO bylaw: members must have saved with the cooperative for at least
-    // MIN_MEMBERSHIP_MONTHS before they can borrow. Checked first, privately:
+    // six months before they can borrow. Checked first, privately:
     // a rejected member's tenure is never published, only the Rejected status.
     if (profile.monthsAsMember < 6) {
         return [0, LoanStatus.Rejected];

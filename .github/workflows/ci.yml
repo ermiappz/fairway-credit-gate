@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Compile with the pinned Compact compiler, then run the contract against the
+  # in-memory simulator. No Docker, no proof server: a couple of minutes.
+  # The devnet lane (real proofs) runs inside midnight-examples; see onchain/.
+  simulator:
+    name: compile 0.31.1 + simulator tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install the Compact toolchain
+        run: |
+          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Pin the compiler to 0.31.1
+        env:
+          # compact update queries the GitHub releases API; the token avoids the
+          # anonymous rate limit on shared runners.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          compact update 0.31.1
+          compact compile --version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile the contract (--skip-zk)
+        run: npm run compile:fast
+
+      # The --skip-zk output is committed so `make test` works with Node alone.
+      # Fail if it no longer matches what the pinned compiler produces.
+      - name: Committed compiler output is current
+        run: git diff --exit-code -- contract/managed
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Simulator and signing-service tests
+        run: npm test
+
+      - name: Demo runs end to end
+        run: npm run demo
