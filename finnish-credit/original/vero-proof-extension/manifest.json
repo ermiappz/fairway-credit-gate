@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Fairway Vero Debt-Free Proof",
+  "version": "0.1.0",
+  "description": "Local demo helper that captures the Vero Positive Credit Register /loans response and publishes a Solana attestation.",
+  "host_permissions": [
+    "https://asiointi.positiivinenluottotietorekisteri.fi/*",
+    "https://www.vero.fi/*",
+    "http://localhost:3001/*",
+    "http://127.0.0.1:3001/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://asiointi.positiivinenluottotietorekisteri.fi/*"],
+      "js": ["capture-main.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://asiointi.positiivinenluottotietorekisteri.fi/*",
+        "https://www.vero.fi/en/positivecreditregister/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

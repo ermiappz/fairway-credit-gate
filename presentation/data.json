@@ -436,5 +436,16 @@
     "credit": "https://fairway-credit-desk-ermiappz.ermiarch.chatgpt.site",
     "gate": "https://fairway-credit-gate-ermiappz.ermiarch.chatgpt.site",
     "canary": "https://fairway-canary-ermiappz.ermiarch.chatgpt.site"
+  },
+  "kaamos": {
+    "repository": "https://github.com/fairway-global/kaamos-otc",
+    "source_commit": "2f6425cc7d819337bf2373f3f49972cbf7b34bea",
+    "live_url": "https://kaamos.fairway.global",
+    "verified_at": "2026-10-28",
+    "relationship": "Proposed credit review add-on to the existing Kaamos OTC settlement workflow",
+    "integration_status": "advisory-preview-only",
+    "execution_enabled": false,
+    "currency_boundary": "Credit Desk uses ETB; Kaamos settles USDM/USDC token units. No conversion is established.",
+    "credit_gate_boundary": "Member-policy simulation is separate from the institutional Credit Desk policy. Neither is currently enforced by Kaamos."
   }
 }

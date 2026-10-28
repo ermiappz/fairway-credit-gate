@@ -37,3 +37,7 @@ The browser view displays imported data and recorded local execution. Search, fi
 Keep the repository and hosted Site private. Curated company documents and issue descriptions are authorized for this private demonstration, not for public redistribution. Original source vaults, account settings and credentials are not part of the package. Historical documents retain their dates and source status.
 
 The earlier synthetic reference documentation is preserved in `REFERENCE-README.md`, `DEMO.md` and `WALKTHROUGH.md`. Their original test counts and scope descriptions refer to the reference fixtures, not this private collection.
+
+## Finnish credit eligibility walkthrough
+
+[Open the new demo tab](https://fairway-credit-gate-ermiappz.ermiarch.chatgpt.site/#finnish). [Copied original source and minimal Midnight port](finnish-credit/README.md). Fictional browser walkthrough with official Vero sign-in link; original browser capture and unfinished TLSNotary integration are preserved for provenance. The minimal Compact circuit runs locally; no confirmed network transaction or proof is claimed.

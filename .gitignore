@@ -16,3 +16,5 @@ contract/managed/*/zkir/*.bzkir
 
 # midnight-js private state created by the devnet lane
 midnight-level-db/
+
+/finnish-credit/midnight/managed/

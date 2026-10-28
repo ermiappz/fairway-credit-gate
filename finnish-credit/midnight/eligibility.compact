@@ -1,0 +1,12 @@
+// Minimal evaluation-only port of the Solana risk_flags == 0 predicate.
+// NOT a TLSNotary verifier: witness values are untrusted demo inputs.
+// No authentication, freshness, identity binding or replay protection is claimed.
+pragma language_version 0.23;
+import CompactStandardLibrary;
+export ledger eligibility: Map<Bytes<32>, Boolean>;
+witness riskFlags(): Uint<16>;
+export circuit recordEligibility(subject: Bytes<32>): Boolean {
+  const eligible = riskFlags() == 0;
+  eligibility.insert(disclose(subject), disclose(eligible));
+  return disclose(eligible);
+}

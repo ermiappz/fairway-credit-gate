@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Finnish Credit Proof — PoC Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0a0e1a;--s:#111827;--s2:#1a2236;--b:#1e2d45;--a:#38bdf8;--a2:#a78bfa;--a3:#34d399;--w:#fb923c;--t:#e2e8f0;--m:#64748b;--code:#0d1117}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t);font-family:'Syne',sans-serif;line-height:1.6}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(56,189,248,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+.wrap{max-width:1000px;margin:0 auto;padding:48px 20px 80px;position:relative;z-index:1}
+.mono{font-family:'JetBrains Mono',monospace}
+h1{font-size:clamp(26px,4vw,40px);font-weight:800;background:linear-gradient(135deg,var(--a),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+.sub{color:var(--m);margin-bottom:40px;font-size:15px}
+.tag{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--a);text-transform:uppercase;display:block;margin-bottom:12px}
+
+/* ── SYSTEM FLOW ── */
+.system{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:48px}
+@media(max-width:700px){.system{grid-template-columns:1fr}}
+.sys-box{background:var(--s);border:1px solid var(--b);border-radius:12px;padding:18px;position:relative;overflow:hidden}
+.sys-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.sys-box.blue::before{background:linear-gradient(90deg,var(--a),#0284c7)}
+.sys-box.purple::before{background:linear-gradient(90deg,var(--a2),#7c3aed)}
+.sys-box.green::before{background:linear-gradient(90deg,var(--a3),#059669)}
+.sys-box.orange::before{background:linear-gradient(90deg,var(--w),#ea580c)}
+.sys-box.pink::before{background:linear-gradient(90deg,#f472b6,#db2777)}
+.sys-box.teal::before{background:linear-gradient(90deg,#2dd4bf,#0d9488)}
+.sys-icon{font-size:28px;margin-bottom:10px}
+.sys-name{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.sys-name.blue{color:var(--a)}.sys-name.purple{color:var(--a2)}.sys-name.green{color:var(--a3)}.sys-name.orange{color:var(--w)}.sys-name.pink{color:#f472b6}.sys-name.teal{color:#2dd4bf}
+.sys-desc{font-size:12px;color:#94a3b8;margin-bottom:10px}
+.file-list{display:flex;flex-direction:column;gap:3px}
+.file-item{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--m);background:var(--code);padding:3px 7px;border-radius:4px;border-left:2px solid}
+.file-item.blue{border-color:var(--a)}.file-item.purple{border-color:var(--a2)}.file-item.green{border-color:var(--a3)}.file-item.orange{border-color:var(--w)}.file-item.pink{border-color:#f472b6}.file-item.teal{border-color:#2dd4bf}
+
+/* ── FLOW ARROWS ── */
+.flow-row{display:flex;align-items:center;gap:0;overflow-x:auto;margin-bottom:40px;padding:4px 0}
+.flow-node{flex-shrink:0;background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:12px 14px;text-align:center;min-width:100px}
+.flow-node .fn-icon{font-size:20px;display:block;margin-bottom:4px}
+.flow-node .fn-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--a);text-transform:uppercase;display:block;margin-bottom:2px}
+.flow-node .fn-sub{font-size:10px;color:var(--m)}
+.flow-sep{flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:0 4px}
+.flow-arrow{font-size:14px;color:var(--b)}
+.flow-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--m);white-space:nowrap}
+
+/* ── FILES TREE ── */
+.tree-section{margin-bottom:40px}
+.tree-title{font-size:18px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.badge{font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 7px;border-radius:4px;background:var(--s2);border:1px solid var(--b);font-weight:400}
+pre{background:var(--code);border:1px solid var(--b);border-radius:10px;padding:18px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.8;color:#a9b1d6}
+.kw{color:#bb9af7}.str{color:#9ece6a}.cmt{color:#565f89;font-style:italic}.fn{color:#7aa2f7}.val{color:#e0af68}.type{color:#2dd4bf}.warn{color:var(--w)}
+
+/* ── DATA FLOW ── */
+.data-flow{background:var(--s);border:1px solid var(--b);border-radius:12px;padding:24px;margin-bottom:40px}
+.df-step{display:flex;gap:14px;margin-bottom:16px;align-items:flex-start}
+.df-num{width:28px;height:28px;min-width:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#000}
+.df-body h4{font-size:13px;font-weight:700;margin-bottom:3px}
+.df-body p{font-size:12px;color:#94a3b8;line-height:1.5}
+.df-body code{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--code);padding:1px 5px;border-radius:3px;color:var(--a)}
+
+/* ── CALLOUT ── */
+.callout{display:flex;gap:12px;padding:14px;border-radius:10px;margin:20px 0;font-size:13px}
+.callout.warn{background:rgba(251,146,60,.06);border:1px solid rgba(251,146,60,.2)}
+.callout.tip{background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.2)}
+.callout.info{background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="tag">// proof of concept · minimum viable implementation</span>
+  <h1>Finnish Credit Proof → Solana DeFi</h1>
+  <p class="sub">Debt-free Vero loan summary → local browser proof → Phantom → Solana attestation → BTC loan eligibility</p>
+
+  <!-- SYSTEM COMPONENTS -->
+  <span class="tag">// system components</span>
+  <div class="system">
+    <div class="sys-box blue">
+      <div class="sys-icon">🧩</div>
+      <div class="sys-name blue">Browser Proof Extension</div>
+      <div class="sys-desc">Local Chrome extension. Opens Vero Positive Credit Register, captures the authenticated /loans response, and asks the verifier to publish a debt-free attestation.</div>
+      <div class="file-list">
+        <div class="file-item blue">tlsn-plugin/src/index.js</div>
+        <div class="file-item blue">tlsn-plugin/package.json</div>
+        <div class="file-item blue">→ builds to dist/index.wasm</div>
+      </div>
+    </div>
+
+    <div class="sys-box purple">
+      <div class="sys-icon">⛓️</div>
+      <div class="sys-name purple">Solana Program</div>
+      <div class="sys-desc">Anchor program storing CreditAttestation PDA per wallet. Only the verifier server can write. Lending protocols read it to approve loans.</div>
+      <div class="file-list">
+        <div class="file-item purple">solana-program/src/lib.rs</div>
+        <div class="file-item purple">solana-program/Anchor.toml</div>
+        <div class="file-item purple">solana-program/Cargo.toml</div>
+      </div>
+    </div>
+
+    <div class="sys-box green">
+      <div class="sys-icon">🔍</div>
+      <div class="sys-name green">Verifier Server</div>
+      <div class="sys-desc">Node.js Express server. Receives the captured Vero response, checks host + /loans JSON + risk_flags==0, then writes on-chain attestation.</div>
+      <div class="file-list">
+        <div class="file-item green">verifier-server/server.mjs</div>
+        <div class="file-item green">verifier-server/package.json</div>
+        <div class="file-item green">verifier-server/.env.example</div>
+      </div>
+    </div>
+
+    <div class="sys-box orange">
+      <div class="sys-icon">🖥️</div>
+      <div class="sys-name orange">Frontend</div>
+      <div class="sys-desc">React + Vite app. Phantom wallet connection, triggers TLSN plugin via Provider API, shows on-chain attestation status.</div>
+      <div class="file-list">
+        <div class="file-item orange">frontend/src/App.tsx</div>
+        <div class="file-item orange">frontend/src/main.tsx</div>
+        <div class="file-item orange">frontend/package.json</div>
+      </div>
+    </div>
+
+    <div class="sys-box pink">
+      <div class="sys-icon">🏦</div>
+      <div class="sys-name pink">Vero Positive Credit Register</div>
+      <div class="sys-desc">Finnish official credit register. Private individuals authenticate through Suomi.fi; production lender API requires Tax Administration certificates and legal data permission.</div>
+      <div class="file-list">
+        <div class="file-item pink">omatieto/en/omien-tietojen-tarkastus</div>
+        <div class="file-item pink">Strong auth: OP, Nordea, S-Pankki...</div>
+        <div class="file-item pink">→ returns credit JSON</div>
+      </div>
+    </div>
+
+    <div class="sys-box teal">
+      <div class="sys-icon">📋</div>
+      <div class="sys-name teal">Future TLSNotary</div>
+      <div class="sys-desc">Planned upgrade path. The current demo uses browser capture; production should replace this with a TLSNotary proof and verifier.</div>
+      <div class="file-list">
+        <div class="file-item teal">notary.pse.dev (public dev)</div>
+        <div class="file-item teal">or: self-hosted Rust binary</div>
+        <div class="file-item teal">→ Ed25519 signature</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- END-TO-END DATA FLOW -->
+  <span class="tag">// end-to-end data flow</span>
+  <div class="data-flow">
+    <div class="df-step">
+      <div class="df-num" style="background:#38bdf8">1</div>
+      <div class="df-body">
+        <h4>User connects Phantom wallet on frontend</h4>
+        <p>Wallet pubkey is captured. Frontend checks if a <code>CreditAttestation</code> PDA already exists for this wallet on Solana Devnet.</p>
+      </div>
+    </div>
+    <div class="df-step">
+      <div class="df-num" style="background:#a78bfa">2</div>
+      <div class="df-body">
+        <h4>Frontend starts a Vero proof session</h4>
+        <p>The dApp stores the connected wallet in the local verifier and opens the official Vero sign-in page.</p>
+      </div>
+    </div>
+    <div class="df-step">
+      <div class="df-num" style="background:#fb923c">3</div>
+      <div class="df-body">
+        <h4>Plugin opens Vero sign-in — user authenticates with Suomi.fi</h4>
+        <p>Extension intercepts matching Positive Credit Register requests after authentication. Plugin watches for the extract/e-service response.</p>
+      </div>
+    </div>
+    <div class="df-step">
+      <div class="df-num" style="background:#34d399">4</div>
+      <div class="df-body">
+        <h4>Extension captures the Vero <code>/loans</code> REST response</h4>
+        <p>The extension sees the authenticated response after the user opens Loan information. The user clicks Create proof in the overlay to publish.</p>
+      </div>
+    </div>
+    <div class="df-step">
+      <div class="df-num" style="background:#2dd4bf">5</div>
+      <div class="df-body">
+        <h4>Frontend POSTs proof + wallet address to verifier server</h4>
+        <p>Verifier checks: server is the Vero e-service host ✓, path includes <code>/loans</code> ✓, debt totals are zero ✓, loan/delay/foreclosure arrays are empty ✓, <code>risk_flags == 0</code> ✓.</p>
+      </div>
+    </div>
+    <div class="df-step">
+      <div class="df-num" style="background:#f472b6">6</div>
+      <div class="df-body">
+        <h4>Verifier server signs + submits Solana transaction</h4>
+        <p>Calls <code>attest_credit()</code> on the Anchor program. Creates a <code>CreditAttestation</code> PDA seeded by the wallet pubkey. Stores proof hash, notary pubkey, timestamp, 90-day expiry.</p>
+      </div>
+    </div>
+    <div class="df-step">
+      <div class="df-num" style="background:#9945FF">7</div>
+      <div class="df-body">
+        <h4>Frontend shows on-chain attestation + Solana Explorer link</h4>
+        <p>User shares their <code>CreditAttestation</code> PDA address with a DeFi lending protocol. Protocol calls <code>check_attestation()</code> — gets <code>{ valid: true, risk_flags: 0, expires_at: ... }</code> — and can continue underwriting.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- KEY CODE SNIPPETS -->
+  <div class="tree-section">
+    <div class="tree-title">Solana Account Structure <span class="badge">CreditAttestation PDA</span></div>
+<pre><span class="cmt">// PDA seed: ["credit_attestation", wallet_pubkey]</span>
+<span class="kw">pub struct</span> <span class="type">CreditAttestation</span> {
+    <span class="kw">pub</span> wallet:           <span class="type">Pubkey</span>,      <span class="cmt">// 32 — attested wallet</span>
+    <span class="kw">pub</span> risk_flags:       <span class="type">u32</span>,         <span class="cmt">// 4  — proven value (0)</span>
+    <span class="kw">pub</span> proof_hash:       <span class="type">[u8; 32]</span>,    <span class="cmt">// 32 — SHA-256(raw proof)</span>
+    <span class="kw">pub</span> notary_pubkey:    <span class="type">[u8; 32]</span>,    <span class="cmt">// 32 — which notary signed</span>
+    <span class="kw">pub</span> verifier:         <span class="type">Pubkey</span>,      <span class="cmt">// 32 — verifier server pubkey</span>
+    <span class="kw">pub</span> attested_at:      <span class="type">i64</span>,         <span class="cmt">// 8  — TLS session timestamp</span>
+    <span class="kw">pub</span> expires_at:       <span class="type">i64</span>,         <span class="cmt">// 8  — +30 days</span>
+    <span class="kw">pub</span> revoked:          <span class="type">bool</span>,        <span class="cmt">// 1</span>
+    <span class="kw">pub</span> bump:             <span class="type">u8</span>,          <span class="cmt">// 1</span>
+}
+
+<span class="cmt">// A lending protocol verifies eligibility like this:</span>
+<span class="kw">let</span> [pda, _] = <span class="fn">PublicKey.findProgramAddressSync</span>(
+    [<span class="fn">Buffer.from</span>(<span class="str">"credit_attestation"</span>), userWallet.<span class="fn">toBuffer</span>()],
+    PROGRAM_ID
+);
+<span class="kw">const</span> account = <span class="kw">await</span> program.account.creditAttestation.<span class="fn">fetch</span>(pda);
+<span class="fn">assert</span>(account.paymentDefaults === <span class="val">0</span> && !account.revoked);
+<span class="fn">assert</span>(account.expiresAt.<span class="fn">toNumber</span>() > Date.<span class="fn">now</span>() / <span class="val">1000</span>);</pre>
+  </div>
+
+  <div class="tree-section">
+    <div class="tree-title">Selective Disclosure Config <span class="badge">plugin handlers</span></div>
+<pre><span class="cmt">// Only these bytes are revealed in the proof:</span>
+handlers: [
+    <span class="cmt">// SENT: reveal request line, hide auth cookies</span>
+    { type: <span class="str">"SENT"</span>, part: <span class="str">"START_LINE"</span>, action: <span class="str">"REVEAL"</span> },
+    { type: <span class="str">"SENT"</span>, part: <span class="str">"HEADERS"</span>,    action: <span class="str">"CONCEAL"</span> }, <span class="cmt">// ← hides Cookie</span>
+
+    <span class="cmt">// RECV: reveal status + the Vero fields needed to prove risk_flags == 0</span>
+    { type: <span class="str">"RECV"</span>, part: <span class="str">"START_LINE"</span>, action: <span class="str">"REVEAL"</span> },
+    { type: <span class="str">"RECV"</span>, part: <span class="str">"HEADERS"</span>,    action: <span class="str">"CONCEAL"</span> },
+    {
+        type: <span class="str">"RECV"</span>, part: <span class="str">"BODY"</span>, action: <span class="str">"REVEAL_MATCH"</span>,
+        match: <span class="val">/"creditInformationSummary"\s*:\s*\{[^}]+\}/</span>,
+        <span class="cmt">// plus "loans": [] for the no-loans proof</span>
+        <span class="cmt">// everything else in the JSON body stays concealed</span>
+    }
+]
+
+<span class="cmt">// What the verifier sees in the proof's revealed bytes:</span>
+<span class="cmt">// GET /omatieto/api/own-information HTTP/1.1    ← request line</span>
+<span class="cmt">// HTTP/1.1 200 OK                              ← response status</span>
+<span class="cmt">// "loanContractsCount": 0 and "loans": []      ← enough for no-loans proof</span>
+<span class="cmt">// (everything else: ████████████████████)      ← concealed</span></pre>
+  </div>
+
+  <!-- LIMITATIONS -->
+  <div class="callout warn">
+    <span style="font-size:18px">⚠️</span>
+    <div>
+      <strong>Key implementation notes before going to production:</strong><br/>
+      <span style="font-size:12px;color:#94a3b8">
+        (1) <strong>Vero browser endpoint</strong> — the exact private e-service JSON path must be confirmed by inspecting real network traffic after auth. The production lender API is documented as <code>/GetCreditRegisterExtract</code> but requires certificates and legal permission. &nbsp;
+        (2) <strong>TLS compatibility</strong> — TLSNotary support depends on the target TLS configuration. Check the Vero host before a live demo. &nbsp;
+        (3) <strong>Notary signature verification</strong> — the verifier server's <code>verifyNotarySignature()</code> is stubbed. Implement proper Ed25519 verification with <code>tweetnacl</code> before mainnet. &nbsp;
+        (4) <strong>Anchor discriminator</strong> — recompute the discriminator hash in <code>buildAttestCreditData()</code> after program compilation. &nbsp;
+        (5) <strong>Regulatory</strong> — using credit bureau data in DeFi crosses into EU financial regulation territory (PSD2, GDPR, MiCA). Get legal advice before production.
+      </span>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <span style="font-size:18px">🚀</span>
+    <div>
+      <strong>Quick start order:</strong> 
+      <code style="font-family:monospace;font-size:12px;color:#34d399">
+        anchor deploy → verifier keygen → fill .env files → npm run dev (verifier) → npm run dev (frontend) → build plugin wasm → load in TLSN extension
+      </code>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

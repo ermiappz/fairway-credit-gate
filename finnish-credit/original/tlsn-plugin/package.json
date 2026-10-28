@@ -1,0 +1,16 @@
+{
+  "name": "fi-credit-tlsn-plugin",
+  "version": "1.0.0",
+  "description": "TLSNotary plugin for Finnish Positive Credit Register proof",
+  "scripts": {
+    "build": "extism-js src/index.js -o dist/index.wasm",
+    "dev": "extism-js src/index.js -o dist/index.wasm --watch"
+  },
+  "devDependencies": {
+    "@extism/js-pdk": "^1.0.0"
+  },
+  "notes": {
+    "install-extism": "curl -O https://raw.githubusercontent.com/extism/js-pdk/main/install.sh && bash install.sh",
+    "load-plugin": "In TLSNotary extension → Plugins tab → Load Local Plugin → select dist/index.wasm"
+  }
+}

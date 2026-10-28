@@ -1,0 +1,30 @@
+{
+  "name": "fi-credit-proof",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Root orchestrator for the fi-credit-proof monorepo (frontend + verifier + tlsn-plugin + solana-program).",
+  "scripts": {
+    "install:all": "npm install && npm --prefix frontend install && npm --prefix verifier-server install && npm --prefix tlsn-plugin install",
+
+    "dev": "concurrently -n verifier,frontend -c blue,magenta \"npm run dev:verifier\" \"npm run dev:frontend\"",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:verifier": "npm --prefix verifier-server run dev",
+    "dev:plugin": "npm --prefix tlsn-plugin run dev",
+    "dev:validator": "solana-test-validator --reset --quiet",
+
+    "build": "npm run build:frontend && npm run build:plugin",
+    "build:all": "npm run build:frontend && npm run build:plugin && npm run build:program",
+    "build:frontend": "npm --prefix frontend run build",
+    "build:plugin": "npm --prefix tlsn-plugin run build",
+    "build:program": "cd solana-program && anchor build",
+
+    "start": "npm --prefix verifier-server run start",
+    "preview": "npm --prefix frontend run preview",
+
+    "deploy:program": "cd solana-program && anchor deploy",
+    "clean": "rm -rf frontend/dist frontend/node_modules verifier-server/node_modules tlsn-plugin/dist tlsn-plugin/node_modules solana-program/target node_modules"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
