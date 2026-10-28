@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": ".",
+    "lib": ["ES2022", "DOM"]
+  },
+  "include": ["contract/**/*.ts", "attestation-api/**/*.ts", "test/**/*.ts", "demo/**/*.ts", "onchain/**/*.ts"]
+}

@@ -23,8 +23,8 @@ import { setNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 import type { EnvironmentConfiguration } from '@midnight-ntwrk/testkit-js';
 import { firstValueFrom, throwError } from 'rxjs';
 import { filter, take, tap, timeout } from 'rxjs/operators';
-import { getConfig } from '../src/config.js';
-import { MidnightWalletProvider, syncWallet } from '../src/wallet.js';
+import { getConfig } from './config.js';
+import { MidnightWalletProvider, syncWallet } from './wallet.js';
 
 // Must match src/test/sacco-credit-gate.test.ts.
 const ALICE_SEED = '0000000000000000000000000000000000000000000000000000000000000001';

@@ -31,10 +31,10 @@ import { type EnvironmentConfiguration } from '@midnight-ntwrk/testkit-js';
 import { resolveWallet, waitForNightThenDust } from '@midnight-ntwrk/example-fast-sync';
 import pino from 'pino';
 
-import { getConfig } from '../config.js';
-import { MidnightWalletProvider, syncWallet } from '../wallet.js';
-import { buildProviders, type SaccoCreditGateCircuits, type SaccoCreditGateProviders } from '../providers.js';
-import { createSaccoCreditGatePrivateState, type SaccoCreditGatePrivateState } from '../../contract/witnesses.js';
+import { getConfig } from './config.js';
+import { MidnightWalletProvider, syncWallet } from './wallet.js';
+import { buildProviders, type SaccoCreditGateCircuits, type SaccoCreditGateProviders } from './providers.js';
+import { createSaccoCreditGatePrivateState, type SaccoCreditGatePrivateState } from '../contract/witnesses.js';
 import {
   CompiledSaccoCreditGateContract,
   Contract,
@@ -42,11 +42,11 @@ import {
   ledger,
   pureCircuits,
   zkConfigPath,
-} from '../../contract/index.js';
+} from '../contract/index.js';
 import type restify from 'restify';
-import { createServer } from '../../attestation-api/server.js';
-import { generateKeyPair } from '../../attestation-api/signing.js';
-import type { AttestationResponse, ProviderInfoResponse } from '../../attestation-api/types.js';
+import { createServer } from '../attestation-api/server.js';
+import { generateKeyPair } from '../attestation-api/signing.js';
+import type { AttestationResponse, ProviderInfoResponse } from '../attestation-api/types.js';
 
 // Required for GraphQL subscriptions in Node.js
 // @ts-expect-error WebSocket global assignment for apollo
